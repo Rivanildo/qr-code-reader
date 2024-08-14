@@ -26,7 +26,7 @@
             console.log('QR code lido:', decodedText); // Log do QR code lido
 
             // Envie os dados do QR code para o Google Apps Script
-            fetch('https://script.google.com/macros/s/SEU_WEB_APP_URL/exec', {
+            fetch('https://script.google.com/macros/s/AKfycbz3wHdbWmV44MIIXA_k6hXlFJRfT2ztMk7hWpyUmkeym_NvSVOx4Pn1vkB2JJrGiTcf/exec', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -58,10 +58,8 @@
 
         // Função para iniciar a leitura do QR code
         function startScanning() {
-            // Inicializa o Html5Qrcode
             var html5QrCode = new Html5Qrcode("qr-reader");
 
-            // Começa a leitura do QR code
             html5QrCode.start(
                 { facingMode: "environment" }, // Configura a câmera traseira
                 { fps: 10, qrbox: 250 }, // FPS e tamanho da área de leitura

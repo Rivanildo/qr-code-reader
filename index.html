@@ -11,16 +11,33 @@
             margin: 0 auto;
             border: 1px solid #ccc;
         }
+ <style>
+        #qr-reader {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+        }
+        #qr-result {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>Leitor de QR Code</h1>
     <div id="qr-reader"></div>
+    <div id="qr-result">Texto lido: <span id="qr-text">Nenhum QR code lido ainda</span></div>
 
     <script>
         // Função chamada quando o QR code é lido com sucesso
         function onScanSuccess(decodedText, decodedResult) {
             console.log('QR code lido:', decodedText);
+
+            // Atualiza o texto mostrado na página
+            document.getElementById('qr-text').innerText = decodedText;
 
             // Envie os dados do QR code para o Google Apps Script
             fetch('https://script.google.com/macros/s/AKfycbw9gvHIs8SeRFKATme9nZFfZxQiu8NdOk6NBmg5PiDvHMof1x2kOVmzTW4UtN81m3km/exec', {

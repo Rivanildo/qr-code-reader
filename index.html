@@ -1,61 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Reader</title>
-    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <title>Leitor de QR Code</title>
+    <!-- Inclua a biblioteca do html5-qrcode -->
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <style>
-        #reader {
-            width: 300px;
-            margin: auto;
-        }
-        h1 {
-            text-align: center;
+        /* Estilos básicos para a área do leitor */
+        #qr-reader {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
         }
     </style>
 </head>
 <body>
-    <h1>QR Code Reader</h1>
-    <div id="reader"></div>
+    <h1>Leitor de QR Code</h1>
+    <!-- Área onde o QR code será lido -->
+    <div id="qr-reader"></div>
+
     <script>
-        function sendToGoogleSheets(data) {
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbz3wHdbWmV44MIIXA_k6hXlFJRfT2ztMk7hWpyUmkeym_NvSVOx4Pn1vkB2JJrGiTcf/exec'; // Substitua pela URL do seu Web App
-            fetch(scriptURL, {
+        // Função chamada quando o QR code é lido com sucesso
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log('QR code lido:', decodedText); // Log do QR code lido
+
+            // Envie os dados do QR code para o Google Apps Script
+            fetch('https://script.google.com/macros/s/SEU_WEB_APP_URL/exec', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ data: data }),
+                body: JSON.stringify({ data: decodedText })
             })
-            .then(response => alert('Dados enviados para a planilha!'))
-            .catch(error => console.error('Erro:', error));
+            .then(response => response.text())
+            .then(result => {
+                console.log('Success:', result);
+                alert('Dados armazenados na planilha com sucesso!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao armazenar dados na planilha.');
+            });
+
+            // Parar a leitura após sucesso
+            html5QrCode.stop().then(ignore => {
+                console.log('QR code scanning stopped.');
+            }).catch(err => {
+                console.error('Erro ao parar a leitura do QR code:', err);
+            });
         }
 
-        function onScanSuccess(qrCodeMessage) {
-            alert(`QR Code lido: ${qrCodeMessage}`);
-            sendToGoogleSheets(qrCodeMessage);
-        }
-
+        // Função chamada em caso de erro na leitura do QR code
         function onScanError(errorMessage) {
-            console.error(`Erro na leitura do QR code: ${errorMessage}`);
+            console.error('Scan error:', errorMessage);
         }
 
-        const html5QrCode = new Html5Qrcode("reader");
-        const qrCodeSuccessCallback = onScanSuccess;
-        const qrCodeErrorCallback = onScanError;
+        // Função para iniciar a leitura do QR code
+        function startScanning() {
+            // Inicializa o Html5Qrcode
+            var html5QrCode = new Html5Qrcode("qr-reader");
 
-        html5QrCode.start(
-            { facingMode: "environment" }, // Rear camera
-            {
-                fps: 10, // Optional, 10 frames per second for reading QR codes
-                qrbox: 250 // Optional, box around QR code for easier detection
-            },
-            qrCodeSuccessCallback,
-            qrCodeErrorCallback
-        ).catch(err => {
-            console.log(`Erro ao iniciar a câmera: ${err}`);
-        });
+            // Começa a leitura do QR code
+            html5QrCode.start(
+                { facingMode: "environment" }, // Configura a câmera traseira
+                { fps: 10, qrbox: 250 }, // FPS e tamanho da área de leitura
+                onScanSuccess, // Callback em caso de sucesso
+                onScanError // Callback em caso de erro
+            ).catch(err => {
+                console.error('Erro ao iniciar a leitura do QR code:', err);
+                alert('Erro ao iniciar a leitura do QR code.');
+            });
+        }
+
+        // Inicia a leitura do QR code quando a página carrega
+        window.onload = function() {
+            startScanning();
+        }
     </script>
 </body>
 </html>

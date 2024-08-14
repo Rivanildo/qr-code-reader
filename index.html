@@ -3,7 +3,7 @@
 <head>
     <title>Leitor de QR Code</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <style>
+     <style>
         #qr-reader {
             width: 100%;
             max-width: 600px;
@@ -18,10 +18,12 @@
     <div id="qr-reader"></div>
 
     <script>
+        // Função chamada quando o QR code é lido com sucesso
         function onScanSuccess(decodedText, decodedResult) {
             console.log('QR code lido:', decodedText);
 
-            fetch('https://script.google.com/macros/s/AKfycbz3wHdbWmV44MIIXA_k6hXlFJRfT2ztMk7hWpyUmkeym_NvSVOx4Pn1vkB2JJrGiTcf/exec', {
+            // Envie os dados do QR code para o Google Apps Script
+            fetch('https://script.google.com/macros/s/AKfycbw9gvHIs8SeRFKATme9nZFfZxQiu8NdOk6NBmg5PiDvHMof1x2kOVmzTW4UtN81m3km/exec', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -38,6 +40,7 @@
                 alert('Erro ao armazenar dados na planilha.');
             });
 
+            // Opcional: Parar a leitura após sucesso
             html5QrCode.stop().then(ignore => {
                 console.log('QR code scanning stopped.');
             }).catch(err => {
@@ -45,24 +48,27 @@
             });
         }
 
+        // Função chamada em caso de erro na leitura do QR code
         function onScanError(errorMessage) {
-            console.error('Scan error:', errorMessage);
+            console.error('Erro na leitura:', errorMessage);
         }
 
+        // Iniciar a leitura do QR code
         function startScanning() {
-            var html5QrCode = new Html5Qrcode("qr-reader");
+            const html5QrCode = new Html5Qrcode("qr-reader");
 
             html5QrCode.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: 250 },
-                onScanSuccess,
-                onScanError
+                { facingMode: "environment" }, // Usar câmera traseira
+                { fps: 10, qrbox: 250 }, // Configurar FPS e tamanho da área de leitura
+                onScanSuccess, // Callback em caso de sucesso
+                onScanError // Callback em caso de erro
             ).catch(err => {
-                console.error('Erro ao iniciar a leitura do QR code:', err);
+                console.error('Erro ao iniciar a leitura:', err);
                 alert('Erro ao iniciar a leitura do QR code.');
             });
         }
 
+        // Iniciar a leitura quando a página carregar
         window.onload = function() {
             startScanning();
         }
